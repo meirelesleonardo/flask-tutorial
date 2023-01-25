@@ -1,0 +1,4 @@
+
+
+USER_LOGADO="me"
+ATUALIZA_FOTOS_AGENTES="agentes/fotos"
