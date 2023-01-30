@@ -1,13 +1,13 @@
 import requests
 import json
 from decouple import config
-import api_mapa.URLS as URLS
+import time, sys
 
 login_usser = config("LOGIN_USER")
 login_password = config("LOGIN_PASSWORD")
 
 token = None
-
+n = 0
 def get_token():  
     global token  
     resposta = requests.post(config("URL_API_MAPA")+"login", json={"cpf":login_usser ,"password": login_usser})
@@ -16,26 +16,25 @@ def get_token():
     print("Token: " + str(resposta.status_code))
 
 def atualiza_foto_agente():
+    global n
     if token == None:
         get_token()
     headers = { 'Authorization' : "Bearer " + token,
                 'Content-Type': "Bearer " + token}
 
-    resposta = requests.get(url=config("URL_API_MAPA")+URLS.ATUALIZA_FOTOS_AGENTES,headers=headers)
-    print(resposta.status_code)
-    
-    if resposta.status_code == 500:
+    try:
+        resposta = requests.get(url=config("URL_API_MAPA")+"agentes/fotos",headers=headers)
+
+        n = n+1
+        print(resposta.status_code, "Atualizado: ",n)
+        
+        if resposta.status_code > 299:
+            time.sleep(1) # Aguarda 1 segundo
+            atualiza_foto_agente()
+    except:
+        n = n+1
+        print("Atualizado: ",n)
+        time.sleep(1) # Aguarda 1 segundo
         atualiza_foto_agente()
 
-def get_agente_logado():
-    if token == None:
-        get_token()
-    headers = { 'Authorization' : "Bearer " + token,
-                'Content-Type': "Bearer " + token}
-
-    resposta = requests.get(url=config("URL_API_MAPA") + URLS.USER_LOGADO,headers=headers)
-    print("Dados do Agente: ",resposta.status_code)
-
-
-#atualiza_foto_agente()
-get_agente_logado()
+atualiza_foto_agente()
