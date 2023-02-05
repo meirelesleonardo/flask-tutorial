@@ -13,3 +13,5 @@ dist/
 build/
 *.egg-info/
 .env
+api_mapa/endpont.txt
+api_mapa/model/*
